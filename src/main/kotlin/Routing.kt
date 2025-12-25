@@ -10,8 +10,10 @@ import com.example.model.Task
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
+import io.ktor.server.request.receive
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.SerializationException
 
 fun Application.configureRouting() {
     routing {
@@ -19,14 +21,7 @@ fun Application.configureRouting() {
 
         route(Routes.TASKS) {
             get {
-                call.respond(
-                    listOf(
-                        Task("cleaning", "Clean the house", Priority.Low),
-                        Task("gardening", "Mow the lawn", Priority.Medium),
-                        Task("shopping", "Buy the groceries", Priority.High),
-                        Task("painting", "Paint the fence", Priority.Medium)
-                    )
-                )
+                call.respond(TaskRepository.allTasks())
             }
 
             get(ROUTE_TASK_BY_NAME) {
@@ -59,6 +54,18 @@ fun Application.configureRouting() {
                     }
                     call.respond(tasks)
                 } catch (_: IllegalArgumentException) {
+                    call.respond(HttpStatusCode.BadRequest)
+                }
+            }
+
+            post {
+                try {
+                    val task = call.receive<Task>()
+                    TaskRepository.addTask(task)
+                    call.respond(HttpStatusCode.Created)
+                } catch (_: IllegalStateException) {
+                    call.respond(HttpStatusCode.BadRequest)
+                } catch (_: SerializationException) {
                     call.respond(HttpStatusCode.BadRequest)
                 }
             }
