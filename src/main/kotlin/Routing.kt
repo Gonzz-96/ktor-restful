@@ -69,6 +69,20 @@ fun Application.configureRouting() {
                     call.respond(HttpStatusCode.BadRequest)
                 }
             }
+
+            delete("/{taskName}") {
+                val name = call.parameters[PARAM_TASK_NAME]
+                if (name == null) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@delete
+                }
+
+                if (TaskRepository.removeTask(name)) {
+                    call.respond(HttpStatusCode.NoContent)
+                } else {
+                    call.respond(HttpStatusCode.NotFound)
+                }
+            }
         }
     }
 }
