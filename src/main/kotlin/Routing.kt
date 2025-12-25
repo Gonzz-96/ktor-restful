@@ -1,5 +1,9 @@
 package com.example
 
+import com.example.Routes.PARAM_PRIORITY
+import com.example.Routes.PARAM_TASK_NAME
+import com.example.Routes.ROUTE_TASK_BY_NAME
+import com.example.Routes.ROUTE_TASK_BY_PRIORITY
 import com.example.com.example.model.TaskRepository
 import com.example.model.Priority
 import com.example.model.Task
@@ -25,8 +29,8 @@ fun Application.configureRouting() {
                 )
             }
 
-            get("/byName/{taskName}") {
-                val name = call.parameters["taskName"]
+            get(ROUTE_TASK_BY_NAME) {
+                val name = call.parameters[PARAM_TASK_NAME]
                 if (name == null) {
                     call.respond(HttpStatusCode.BadRequest)
                     return@get
@@ -40,8 +44,8 @@ fun Application.configureRouting() {
                 call.respond(task)
             }
 
-            get("/byPriority/{priority}") {
-                val priorityString = call.parameters["priority"]
+            get(ROUTE_TASK_BY_PRIORITY) {
+                val priorityString = call.parameters[PARAM_PRIORITY]
                 if (priorityString == null) {
                     call.respond(HttpStatusCode.BadRequest)
                     return@get
@@ -62,6 +66,14 @@ fun Application.configureRouting() {
     }
 }
 
-private object Routes {
+object Routes {
     const val TASKS = "/tasks"
+
+    const val PARAM_PRIORITY = "priority"
+    const val PARAM_TASK_NAME = "taskName"
+
+    const val ROUTE_TASK_BY_PRIORITY = "/byPriority/{$PARAM_PRIORITY}"
+    const val ROUTE_TASK_BY_NAME = "/byName/{$PARAM_TASK_NAME}"
+
+
 }
